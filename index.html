@@ -26,8 +26,36 @@ table{width:100%;border-collapse:collapse;margin-top:10px}td,th{text-align:left;
 footer{text-align:center;color:var(--muted);font-size:11px;padding:24px}
 @media(max-width:600px){.grid{grid-template-columns:1fr}.card{padding:17px}h1{font-size:29px}.metrics{gap:12px}.metric strong{font-size:22px}}
 @media print{header,.tabs,.actions,footer{display:none!important}body{background:white}.panel{display:none!important}.panel.active{display:block!important}.card{border:0}main{margin:0}}
+
+/* Tela de acesso */
+body.locked{overflow:hidden}
+#accessGate{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:22px;background:var(--cream)}
+#accessGate[hidden]{display:none}
+.access-card{width:min(100%,420px);background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:36px 30px;text-align:center;box-shadow:0 18px 55px rgba(55,62,44,.08)}
+.access-brand{font:30px Georgia,serif;color:var(--ink)}
+.access-brand small{display:block;font:10px Arial,sans-serif;letter-spacing:3px;text-transform:uppercase;color:var(--olive);margin-top:5px}
+.access-line{width:42px;height:2px;background:var(--olive);margin:25px auto}
+.access-card h1{font-size:27px;margin:0 0 8px}
+.access-card p{margin:0 0 22px}
+.access-card input{text-align:center;letter-spacing:2px}
+.access-card button{width:100%;margin-top:12px}
+#accessError{min-height:20px;color:var(--danger);font-size:12px;margin-top:10px}
+#appContent[hidden]{display:none}
 </style></head>
-<body>
+<body class="locked">
+<div id="accessGate">
+  <form class="access-card" id="accessForm">
+    <div class="access-brand">Azôca<small>Ateliê inteligente</small></div>
+    <div class="access-line"></div>
+    <div class="eyebrow">Área exclusiva para alunas</div>
+    <h1>Bem-vinda!</h1>
+    <p>Digite a senha de acesso para abrir sua calculadora.</p>
+    <input id="accessPassword" type="password" placeholder="Digite sua senha" autocomplete="current-password" aria-label="Senha de acesso" required>
+    <button class="primary" type="submit">Acessar calculadora</button>
+    <div id="accessError" role="alert" aria-live="polite"></div>
+  </form>
+</div>
+<div id="appContent" hidden>
 <header><div class="brand">Azôca <small>Ateliê inteligente</small></div></header>
 <main>
 <section><div class="eyebrow">Ferramenta para artesãs</div><h1>Planeje. Produza. Precifique.</h1><p>Descubra a receita da mistura a partir da capacidade de água do seu molde.</p></section>
@@ -142,4 +170,27 @@ function renderRecipes(){
  del.textContent='Excluir';del.className='danger';del.onclick=()=>{const x=JSON.parse(localStorage.getItem('azocaRecipesV2')||'[]');x.splice(i,1);localStorage.setItem('azocaRecipesV2',JSON.stringify(x));renderRecipes()};actions.append(open,del);div.append(info,actions);box.append(div)});
 }
 update();renderRecipes();
-</script></body></html>
+
+// Acesso básico por senha compartilhada. Não substitui autenticação no servidor.
+const SHARED_ACCESS_PASSWORD = 'gesso123';
+const accessGate = document.getElementById('accessGate');
+const appContent = document.getElementById('appContent');
+function unlockApp(){
+  accessGate.hidden = true;
+  appContent.hidden = false;
+  document.body.classList.remove('locked');
+}
+if(sessionStorage.getItem('azocaAccessGranted') === 'yes') unlockApp();
+document.getElementById('accessForm').addEventListener('submit', function(event){
+  event.preventDefault();
+  const entered = document.getElementById('accessPassword').value;
+  if(entered === SHARED_ACCESS_PASSWORD){
+    sessionStorage.setItem('azocaAccessGranted','yes');
+    document.getElementById('accessError').textContent = '';
+    unlockApp();
+  } else {
+    document.getElementById('accessError').textContent = 'Senha incorreta. Confira e tente novamente.';
+    document.getElementById('accessPassword').select();
+  }
+});
+</script></div></body></html>
