@@ -130,7 +130,7 @@ const $=id=>document.getElementById(id), v=id=>Math.max(0,Number($(id).value)||0
 const money=n=>(Number(n)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const fmt=n=>(Number(n)||0).toLocaleString('pt-BR',{maximumFractionDigits:2});
 function calc(){
- const capacity=v('capacity'),qty=Math.max(1,Math.floor(v('qty'))),pct=0.70,factor=1.37,loss=0;
+ const capacity=v('capacity'),qty=Math.max(1,Math.floor(v('qty'))),pct=0.70,factor=1.45,loss=0;
  const waterEach=capacity*pct,plasterEach=waterEach*factor;
  const waterBatch=waterEach*qty,plasterBatch=plasterEach*qty;
  const plasterCost=plasterBatch/1000*v('plasterPrice'),other=qty*(v('finish')+v('pack'))+v('additives');
